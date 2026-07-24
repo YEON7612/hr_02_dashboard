@@ -14,7 +14,7 @@ import pandas as pd
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONSULT_PATH = BASE_DIR / "raw" / "data_consultations.csv"
 SATISFACTION_PATH = BASE_DIR / "raw" / "data_satisfaction.csv"
-OUTPUT_PATH = BASE_DIR / "charts" / "03_카테고리별_저만족도.png"
+OUTPUT_PATH = BASE_DIR / "components" / "output" / "03_카테고리별_저만족도.png"
 
 # 팔레트 (dataviz 스킬 참고 팔레트): 저만족 강조=critical red, 나머지=중립 회색
 COLOR_HIGHLIGHT = "#d03b3b"

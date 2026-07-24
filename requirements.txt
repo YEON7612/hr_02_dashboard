@@ -3,5 +3,6 @@ pandas>=2.0
 matplotlib>=3.8
 plotly>=5.20
 google-cloud-bigquery>=3.20
+google-auth>=2.30
 db-dtypes>=1.2
 statsmodels>=0.14

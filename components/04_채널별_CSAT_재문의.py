@@ -18,7 +18,7 @@ import pandas as pd
 BASE_DIR = Path(__file__).resolve().parent.parent
 CONSULT_PATH = BASE_DIR / "raw" / "data_consultations.csv"
 SATISFACTION_PATH = BASE_DIR / "raw" / "data_satisfaction.csv"
-OUTPUT_PATH = BASE_DIR / "charts" / "04_채널별_CSAT_재문의.png"
+OUTPUT_PATH = BASE_DIR / "components" / "output" / "04_채널별_CSAT_재문의.png"
 
 # 팔레트 (dataviz 스킬 참고 팔레트): CSAT=blue(막대), 재문의율=red(선) — 뚜렷이 다른 색+마크 타입
 COLOR_CSAT = "#2a78d6"

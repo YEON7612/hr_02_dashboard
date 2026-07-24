@@ -13,7 +13,7 @@ from matplotlib.patches import Circle, FancyBboxPatch, Rectangle
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 RAW_PATH = BASE_DIR / "raw" / "data_satisfaction.csv"
-OUTPUT_PATH = BASE_DIR / "charts" / "02_csat_nps_scorecard.png"
+OUTPUT_PATH = BASE_DIR / "components" / "output" / "02_csat_nps_scorecard.png"
 
 # 팔레트 (dataviz 스킬 참고 팔레트)
 COLOR_PAGE = "#f9f9f7"       # 전체 배경(page plane)
