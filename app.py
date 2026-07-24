@@ -154,18 +154,23 @@ def _aggregate_training(raw_df: pd.DataFrame, training_mod) -> pd.DataFrame:
 def render_agent_perspective_section() -> None:
     """"상담원 관점: 직원만족도와 고객 경험" 섹션."""
     st.header("상담원 관점: 직원만족도와 고객 경험")
+
+    # 라이브/스냅샷 자동 전환 데이터 가져오기 (배지 표시를 위해 상단 로드)
+    agents_df, csat_df, training_raw, data_mode = _load_agent_perspective_data()
+
+    # 1. 상태 안내 배지를 섹션 타이틀 직후에 고정 (레이아웃 밀림 방지)
+    if data_mode == "live":
+        st.caption("🟢 **BigQuery 라이브 데이터**로 연동되어 작동 중입니다.")
+    else:
+        st.info("ℹ️ 현재 BigQuery 인증 정보가 없어 **로컬 스냅샷 데이터(2024년 기준)**로 대체 표시 중입니다.")
+
     st.caption(
         "07~09번 차트와 동일한 로직(BigQuery agents/consultations/satisfaction 직접 조인)을 "
         "팀별로 필터링해서 다시 계산합니다."
     )
 
+    # 2. 팀 선택 드롭다운
     team_choice = st.selectbox("팀 선택", TEAM_OPTIONS, key="agent_perspective_team")
-
-    # 라이브/스냅샷 자동 전환 데이터 가져오기
-    agents_df, csat_df, training_raw, data_mode = _load_agent_perspective_data()
-
-    if data_mode == "snapshot":
-        st.info("ℹ️ 현재 BigQuery 서버 연결 제한으로 인해 '저장된 스냅샷 데이터'를 불러왔습니다.")
 
     enps_mod = _load_chart_module("enps_scorecard", "07_plotly_직원만족도eNPS스코어카드.py")
     burnout_mod = _load_chart_module("burnout_scatter", "08_plotly_번아웃CSAT산점도.py")
@@ -184,30 +189,39 @@ def render_agent_perspective_section() -> None:
             "못 미칩니다 — 참고용으로만 보세요."
         )
 
-    st.subheader("eNPS 스코어카드")
-    if team_choice == "전체":
-        fig_enps = enps_mod.build_figure(agents_view)
-    else:
-        team_enps_value = enps_mod.compute_enps(agents_view)
-        fig_enps = go.Figure()
-        enps_mod.add_overall_gauge(fig_enps, team_enps_value, total=len(agents_view))
-        fig_enps.update_layout(
-            title=dict(text=f"{team_choice} eNPS", x=0.02, font=dict(size=18, color=enps_mod.COLOR_PRIMARY_INK)),
-            paper_bgcolor=burnout_mod.COLOR_SURFACE,
-            font=dict(family="Malgun Gothic, Arial", color=enps_mod.COLOR_PRIMARY_INK),
-            height=340,
-            margin=dict(l=40, r=40, t=90, b=20),
-        )
-    st.plotly_chart(fig_enps, width="stretch")
+    # 3. 차트 영역 (컨테이너로 감싸 안정화)
+    with st.container():
+        st.subheader("eNPS 스코어카드")
+        if team_choice == "전체":
+            fig_enps = enps_mod.build_figure(agents_view)
+        else:
+            team_enps_value = enps_mod.compute_enps(agents_view)
+            fig_enps = go.Figure()
+            enps_mod.add_overall_gauge(fig_enps, team_enps_value, total=len(agents_view))
+            fig_enps.update_layout(
+                title=dict(
+                    text=f"{team_choice} eNPS", 
+                    x=0.02, 
+                    font=dict(size=18, color=enps_mod.COLOR_PRIMARY_INK)
+                ),
+                paper_bgcolor=burnout_mod.COLOR_SURFACE,
+                font=dict(family="Malgun Gothic, Arial", color=enps_mod.COLOR_PRIMARY_INK),
+                height=300,
+                margin=dict(l=50, r=50, t=80, b=40),
+                autosize=True
+            )
+        st.plotly_chart(fig_enps, use_container_width=True, key=f"fig_enps_{team_choice}")
 
-    st.subheader("번아웃 x CSAT 산점도")
-    fig_burnout = burnout_mod.build_figure(csat_view)
-    st.plotly_chart(fig_burnout, width="stretch")
+        st.subheader("번아웃 x CSAT 산점도")
+        fig_burnout = burnout_mod.build_figure(csat_view)
+        fig_burnout.update_layout(height=450, autosize=True)
+        st.plotly_chart(fig_burnout, use_container_width=True, key=f"fig_burnout_{team_choice}")
 
-    st.subheader("교육 이수 여부 비교")
-    training_agg = _aggregate_training(training_view_raw, training_mod)
-    fig_training = training_mod.build_figure(training_agg)
-    st.plotly_chart(fig_training, width="stretch")
+        st.subheader("교육 이수 여부 비교")
+        training_agg = _aggregate_training(training_view_raw, training_mod)
+        fig_training = training_mod.build_figure(training_agg)
+        fig_training.update_layout(height=450, autosize=True)
+        st.plotly_chart(fig_training, use_container_width=True, key=f"fig_training_{team_choice}")
 
 
 def main() -> None:
