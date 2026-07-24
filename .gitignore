@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+
+.venv/
+venv/
